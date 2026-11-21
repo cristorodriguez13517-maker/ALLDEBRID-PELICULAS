@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHARKTV PELÍCULAS</title>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+    margin:0;
+    background:#000;
+    color:#fff;
+    font-family:Arial,sans-serif;
+    overflow-x:hidden;
+}
+
+body{-webkit-tap-highlight-color:transparent}
+
+.header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:320px;
+    background:#000 center/cover no-repeat;
+    display:flex;
+    align-items:center;
+    padding:20px;
+    z-index:999;
+    overflow:hidden;
+}
+
+.header::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        linear-gradient(to right,rgba(0,0,0,.9),rgba(0,0,0,.55) 35%,transparent 100%),
+        linear-gradient(to bottom,transparent 35%,#000 100%);
+    pointer-events:none;
+}
+
+.header-info{
+    position:relative;
+    z-index:2;
+    max-width:500px;
+    opacity:0;
+    transition:opacity .25s ease;
+}
+
+.header-info.visible{opacity:1}
+
+.header h1{margin:0}
+
+.header h1 img{
+    display:block;
+    max-width:300px;
+    max-height:80px;
+    object-fit:contain;
+    object-position:left center;
+}
+
+.details{
+    font-size:14px;
+    font-weight:bold;
+    margin:10px 0;
+    line-height:1.7;
+    max-width:480px;
+}
+
+.overview{
+    font-size:12px;
+    line-height:1.45;
+    max-width:450px;
+    margin:8px 0 0;
+}
+
+.content{
+    padding:20px;
+    margin-top:320px;
+    min-height:200px;
+}
+
+.movie-row{
+    display:grid;
+    grid-template-columns:repeat(8,105px);
+    gap:12px;
+    margin-top:15px;
+    align-items:start;
+}
+
+.movie{
+    display:block;
+    width:105px;
+    height:160px;
+    cursor:pointer;
+    outline:none;
+    text-decoration:none;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    overflow:hidden;
+    transform:translateZ(0);
+}
+
+.movie[hidden]{display:none!important}
+
+.movie img{
+    display:block;
+    width:105px;
+    height:160px;
+    object-fit:cover;
+    border:3px solid transparent;
+    background:transparent;
+    outline:none;
+    box-shadow:none;
+    transition:border-color .15s;
+}
+
+.movie.selected img,
+.movie:focus-visible img{
+    border-color:#e50914;
+}
+
+.movie,
+.movie:focus,
+.movie:focus-visible,
+.movie.selected{
+    background:transparent!important;
+    outline:none!important;
+    box-shadow:none!important;
+}
+
+.movie img{
+    background:transparent!important;
+    box-shadow:none!important;
+}
+
+/* BUSCADOR */
+
+.search-container{
+    position:fixed;
+    top:20px;
+    right:30px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    z-index:1001;
+}
+
+.search-button{
+    background:transparent;
+    border:0;
+    padding:6px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    outline:none;
+    border-radius:50%;
+    transform-origin:center;
+    transition:transform .2s ease;
+}
+
+.search-button svg{
+    display:block;
+    width:26px;
+    height:26px;
+    fill:white;
+}
+
+.search-button:hover,
+.search-button:focus,
+.search-button:focus-visible{
+    transform:scale(1.3);
+    outline:none;
+}
+
+.search-input{
+    width:0;
+    min-width:0;
+    padding:8px 0;
+    border:0;
+    border-radius:20px;
+    background:rgba(0,0,0,.9);
+    color:#fff;
+    outline:none;
+    opacity:0;
+    pointer-events:none;
+    transition:width .2s,opacity .2s,padding .2s;
+}
+
+.search-input.active{
+    width:220px;
+    padding:9px 12px;
+    border:1px solid rgba(255,255,255,.5);
+    opacity:1;
+    pointer-events:auto;
+}
+
+.search-input:focus{
+    border-color:rgba(255,255,255,.9);
+}
+
+.status{
+    color:#aaa;
+    font-size:14px;
+    margin-top:20px;
+}
+
+@media(max-width:900px){
+    .movie-row{
+        grid-template-columns:repeat(5,105px);
+    }
+}
+
+@media(max-width:600px){
+    .header{
+        height:320px;
+        padding:15px;
+    }
+
+    .header h1 img{
+        max-width:240px;
+        max-height:70px;
+    }
+
+    .content{
+        margin-top:320px;
+        padding:12px;
+    }
+
+    .movie-row{
+        grid-template-columns:repeat(3,105px);
+        gap:10px;
+    }
+
+    .search-container{
+        right:15px;
+        top:15px;
+    }
+
+    .search-input.active{
+        width:170px;
+    }
+}
+
+/* REPRODUCTOR INTEGRADO */
+.player-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:2000;
+    background:rgba(0,0,0,.96);
+    padding:18px;
+    overflow:auto;
+}
+.player-modal.open{display:flex;align-items:center;justify-content:center}
+.player-box{width:min(100%,980px);margin:auto}
+.player-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.player-top h2{font-size:20px;margin:0}
+.player-close,.source-button{
+    border:1px solid #555;border-radius:8px;background:#181818;color:#fff;
+    padding:11px 14px;font-size:15px;cursor:pointer;min-height:44px
+}
+.player-close:focus-visible,.source-button:focus-visible{outline:2px solid #e50914;outline-offset:2px}
+.player-video-wrap{background:#000;border:1px solid #333;border-radius:10px;overflow:hidden}
+#shark-player{display:block;width:100%;max-height:68vh;aspect-ratio:16/9;background:#000}
+.player-message{color:#bbb;font-size:13px;line-height:1.5;margin:12px 0}
+.source-list{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.source-button.primary{background:#e50914;border-color:#e50914}
+.source-button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:600px){
+ .player-modal{padding:10px}
+ .player-top h2{font-size:16px}
+ #shark-player{max-height:55vh}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- BUSCADOR -->
+
+<div class="search-container">
+
+    <button
+        id="search-button"
+        class="search-button"
+        type="button"
+        aria-label="Abrir buscador"
+        tabindex="0">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5
+            6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5
+            4.99L20.49 19l-4.99-5zm-6 0C8.01 14 6 11.99 6 9.5
+            S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z"/>
+        </svg>
+
+    </button>
+
+    <input
+        id="search"
+        class="search-input"
+        type="text"
+        placeholder="Buscar película o serie..."
+        aria-label="Buscar películas y series"
+        autocomplete="off"
+        tabindex="0">
+
+</div>
+
+<!-- BANNER -->
+
+<div class="header" id="header">
+
+    <div class="header-info" id="info">
+
+        <h1 id="title"></h1>
+
+        <div id="meta" class="details"></div>
+
+        <p id="overview" class="overview"></p>
+
+    </div>
+
+</div>
+
+
+<!-- CATÁLOGO MEZCLADO -->
+
+<div class="content">
+
+    <div class="movie-row" id="movie-row"></div>
+
+    <p class="status" id="status">
+        Cargando películas...
+    </p>
+
+</div>
+
+<script>
+'use strict';
+
+/* REPRODUCCION SEGURA: el enlace directo solo se solicita al iniciar */
+const WORKER_URL = 'https://alldebrid-vlc.cristorodriguez13517.workers.dev/';
+const TURNSTILE_SITE_KEY = '0x4AAAAAAGK-CFVW1ivlcFRe';
+let turnstileWidgetId = null;
+let turnstileResolve = null;
+let turnstileReject = null;
+
+async function prepararTurnstile(){
+    const limite = Date.now() + 15000;
+    while(!window.turnstile && Date.now() < limite){
+        await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    if(!window.turnstile) throw new Error('No se pudo cargar la verificación anti-bots.');
+    const host = document.getElementById('turnstile-container') || (() => {
+        const node=document.createElement('div');
+        node.id='turnstile-container';
+        node.style.cssText='position:fixed;right:12px;bottom:12px;z-index:3000;background:transparent;padding:0;border:0;border-radius:0';
+        document.body.appendChild(node);
+        return node;
+    })();
+    if(turnstileWidgetId === null){
+        turnstileWidgetId=window.turnstile.render(host,{
+            sitekey:TURNSTILE_SITE_KEY,
+            action:'reproducir',
+            execution:'execute',
+            size:'invisible',
+            appearance:'interaction-only',
+            callback:token=>{
+                if(turnstileResolve){const done=turnstileResolve;turnstileResolve=null;turnstileReject=null;done(token);}
+            },
+            'error-callback':code=>{
+                console.error('Turnstile error:',code);
+                if(turnstileReject){const fail=turnstileReject;turnstileResolve=null;turnstileReject=null;fail(new Error('Cloudflare Turnstile: error '+(code||'desconocido')+'. Revisa la Site Key y el dominio autorizado.'));}
+            },
+            'unsupported-callback':()=>{
+                if(turnstileReject){const fail=turnstileReject;turnstileResolve=null;turnstileReject=null;fail(new Error('Este navegador no es compatible con la verificación de Cloudflare.'));}
+            },
+            'timeout-callback':()=>{
+                if(turnstileReject){const fail=turnstileReject;turnstileResolve=null;turnstileReject=null;fail(new Error('Cloudflare agotó el tiempo de verificación.'));}
+            },
+            'expired-callback':()=>{
+                if(turnstileReject){const fail=turnstileReject;turnstileResolve=null;turnstileReject=null;fail(new Error('La verificación caducó. Vuelve a intentarlo.'));}
+            }
+        });
+    }
+}
+async function obtenerTokenTurnstile(){
+    await prepararTurnstile();
+    return new Promise((resolve,reject)=>{
+        turnstileResolve=resolve;
+        turnstileReject=reject;
+        window.turnstile.reset(turnstileWidgetId);
+        window.turnstile.execute(turnstileWidgetId);
+        setTimeout(()=>{
+            if(turnstileReject===reject){
+                turnstileResolve=null;turnstileReject=null;
+                reject(new Error('La verificación está tardando demasiado. Vuelve a intentarlo.'));
+            }
+        },30000);
+    });
+}
+// Prepara el widget invisible mientras se carga el catálogo, sin generar todavía ningún token.
+prepararTurnstile().catch(error=>console.warn('Turnstile aún no está listo:',error));
+
+async function reproducirConWorker(tipo,registro){
+    const magnetId=String(registro?.magnet_id||'');
+    const filePath=String(registro?.file_path||'');
+    if(!/^\d+$/.test(magnetId)||!filePath){
+        alert('Este título no tiene un archivo disponible en AllDebrid.');
+        return;
+    }
+    statusElement.hidden = false;
+    statusElement.textContent = 'Verificando seguridad y preparando reproducción…';
+    try{
+        const token=await obtenerTokenTurnstile();
+        const response=await fetch(WORKER_URL,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({tipo,magnet_id:magnetId,file_path:filePath,token})
+        });
+        const result=await response.json().catch(()=>({}));
+        if(!response.ok||!result.url){
+            throw new Error(result.error||'No se pudo preparar la reproducción.');
+        }
+        abrirVLC(result.url);
+    }catch(error){
+        console.error('Error de reproducción:',error);
+        alert(error.message||'No se pudo iniciar la reproducción.');
+    }finally{
+        statusElement.hidden = true;
+        if(window.turnstile&&turnstileWidgetId!==null){
+            window.turnstile.reset(turnstileWidgetId);
+        }
+    }
+}
+
+
+/* ELEMENTOS */
+
+const header = document.getElementById('header');
+const info = document.getElementById('info');
+const titleElement = document.getElementById('title');
+const metaElement = document.getElementById('meta');
+const overviewElement = document.getElementById('overview');
+
+const searchInput = document.getElementById('search');
+const searchButton = document.getElementById('search-button');
+
+const movieRow = document.getElementById('movie-row');
+const statusElement = document.getElementById('status');
+
+
+let catalog = [];
+let selectedMovie = null;
+
+
+/* NORMALIZAR TEXTO */
+
+function normalizarTexto(texto){
+
+    return String(texto || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .toLocaleLowerCase('es')
+        .trim();
+
+}
+
+
+/* LEER JSON */
+
+async function readJson(file){
+
+    const response = await fetch(
+        './' + file + '?t=' + Date.now(),
+        {cache:'no-store'}
+    );
+
+    if(!response.ok){
+        throw new Error(file + ' HTTP ' + response.status);
+    }
+
+    return response.json();
+
+}
+
+
+/* ELEGIR UNA SOLA COPIA: 4K > 1080p/FHD > 720p > otras */
+function puntuacionCalidad(item){
+    const texto=[
+        item.quality_manual,item.quality,item.file_path,item.file_name,
+        item.filename,item.source_name,item.title,item.name
+    ].filter(Boolean).join(' ').toLowerCase();
+    if(/\b4k\b|2160p|uhd/.test(texto))return 4;
+    if(/1080p|full[ ._-]?hd|\bfhd\b/.test(texto))return 3;
+    if(/720p|\bhd\b/.test(texto))return 2;
+    if(/480p|576p|sd/.test(texto))return 1;
+    return 0;
+}
+function claveContenido(item){
+    const tipo=item._type||'movie';
+    const id=item.tmdb_id||item.id;
+    if(id)return tipo+':tmdb:'+String(id);
+    const titulo=normalizarTexto(titleOf(item));
+    const anio=yearOf(item);
+    return tipo+':title:'+titulo+':'+anio;
+}
+function deduplicarCatalogo(items){
+    const elegidos=new Map();
+    for(const item of items){
+        const key=claveContenido(item);
+        const anterior=elegidos.get(key);
+        if(!anterior){
+            elegidos.set(key,item);
+            continue;
+        }
+        const qa=puntuacionCalidad(anterior), qb=puntuacionCalidad(item);
+        const reproducibleA=!!streamOf(anterior);
+        const reproducibleB=!!streamOf(item);
+        const fechaA=fechaOrden(anterior),fechaB=fechaOrden(item);
+        if(qb>qa || (qb===qa && reproducibleB&&!reproducibleA) ||
+           (qb===qa && reproducibleB===reproducibleA && fechaB>fechaA)){
+            elegidos.set(key,item);
+        }
+    }
+    return [...elegidos.values()];
+}
+
+/* CARGAR PELÍCULAS Y SERIES */
+
+async function loadCatalog(){
+
+    statusElement.hidden = false;
+    statusElement.textContent = 'Cargando películas y series...';
+
+    try{
+
+        const movies = await readJson('peliculas.json');
+        const movieItems = (Array.isArray(movies) ? movies : [])
+            .filter(item => item && typeof item === 'object')
+            .map((item,index)=>({...item,_type:'movie',_originalIndex:index}));
+        catalog = deduplicarCatalogo(movieItems);
+        catalog.sort((a,b)=>fechaOrden(b)-fechaOrden(a));
+
+        renderCatalog();
+
+    }catch(error){
+
+        console.error('Error cargando catálogos:',error);
+
+        statusElement.hidden = false;
+
+        statusElement.textContent =
+            'No se pudieron cargar los catálogos. Comprueba los archivos JSON.';
+
+    }
+
+}
+
+
+/* FECHA DE INCORPORACIÓN */
+
+function fechaOrden(item){
+
+    const campos = [
+
+        'added_at',
+        'addedAt',
+        'date_added',
+        'dateAdded',
+        'created_at',
+        'createdAt',
+        'added_date',
+        'magnet_date',
+        'imported_at',
+        'published_at'
+
+    ];
+
+    for(const campo of campos){
+
+        if(!item[campo])continue;
+
+        const fecha = new Date(item[campo]).getTime();
+
+        if(!Number.isNaN(fecha)){
+            return fecha;
+        }
+
+    }
+
+    return 0;
+
+}
+
+
+/* DATOS DE PELÍCULAS Y SERIES */
+
+function titleOf(item){
+
+    return item.title_manual ||
+        item.title ||
+        item.youtube_title ||
+        item.name ||
+        'Sin título';
+
+}
+
+
+function yearOf(item){
+
+    const date = item.release_date || item.first_air_date;
+
+    if(date){
+        return String(date).slice(0,4);
+    }
+
+    if(item.year){
+        return String(item.year);
+    }
+
+    const text = [
+        item.youtube_title,
+        item.title,
+        item.name
+    ].filter(Boolean).join(' ');
+
+    const match = text.match(/\b(19\d{2}|20\d{2})\b/);
+
+    return match ? match[1] : '';
+
+}
+
+
+function runtimeOf(item){
+
+    const runtime = Number(
+        item.runtime ||
+        item.duration_minutes ||
+        0
+    );
+
+    if(!runtime || runtime <= 0)return '';
+
+    const hours = Math.floor(runtime / 60);
+
+    const minutes = runtime % 60;
+
+    if(hours && minutes){
+        return hours + 'h ' + minutes + 'm';
+    }
+
+    if(hours){
+        return hours + 'h';
+    }
+
+    return minutes + 'm';
+
+}
+
+
+function genresOf(item){
+
+    if(Array.isArray(item.genres)){
+
+        return item.genres.map(genre=>{
+
+            if(typeof genre === 'string'){
+                return genre;
+            }
+
+            return genre && genre.name ? genre.name : '';
+
+        }).filter(Boolean).join(', ');
+
+    }
+
+    if(typeof item.genres === 'string'){
+        return item.genres;
+    }
+
+    return item.genre || item.genre_label || '';
+
+}
+
+
+function qualityOf(item){
+
+    return item.quality_manual ||
+        item.quality ||
+        '';
+
+}
+
+
+function ageOf(item){
+
+    let age =
+        item.age_rating_manual ||
+        item.age_rating ||
+        item.age_certification ||
+        item.certification ||
+        '';
+
+    if(age && !String(age).endsWith('+')){
+        age = String(age) + '+';
+    }
+
+    return age;
+
+}
+
+
+function posterOf(item){
+
+    return item.poster_manual ||
+        item.poster ||
+        '';
+
+}
+
+
+function logoOf(item){
+
+    return item.logo_manual ||
+        item.logo ||
+        item.movie_logo ||
+        '';
+
+}
+
+
+function bannerOf(item){
+
+    return item.backdrop_manual ||
+        item.backdrop ||
+        '';
+
+}
+
+
+function streamOf(item){
+
+    return item.stream_url_manual ||
+        item.stream_url ||
+        item.url ||
+        '';
+
+}
+
+
+/* ABRIR VLC EN ANDROID */
+
+function abrirVLC(url){
+
+    if(!url){
+
+        alert('No hay enlace de reproducción disponible.');
+
+        return;
+
+    }
+
+    try{
+
+        const media = new URL(url);
+
+        if(
+            media.protocol !== 'https:' &&
+            media.protocol !== 'http:'
+        ){
+
+            alert('El enlace de reproducción no es válido.');
+
+            return;
+
+        }
+
+        const intent =
+            'intent://' +
+            media.host +
+            media.pathname +
+            media.search +
+            '#Intent;scheme=' +
+            media.protocol.replace(':','') +
+            ';package=org.videolan.vlc;type=video/*;end';
+
+        window.location.href = intent;
+
+    }catch(error){
+
+        console.error('Error abriendo VLC:',error);
+
+        alert('No se pudo abrir el enlace en VLC.');
+
+    }
+
+}
+
+
+/* ABRIR UNA SERIE */
+
+function abrirSerie(item){
+
+    const id = item.id || item.tmdb_id;
+
+    if(!id){
+
+        alert('Esta serie no tiene un identificador válido.');
+
+        return;
+
+    }
+
+    window.location.href =
+        'series.html?id=' + encodeURIComponent(id);
+
+}
+
+
+/* CREAR TARJETAS */
+
+function renderCatalog(){
+
+    movieRow.replaceChildren();
+
+    selectedMovie = null;
+
+    if(!catalog.length){
+
+        statusElement.hidden = false;
+
+        statusElement.textContent =
+            'Todavía no hay películas ni series disponibles.';
+
+        limpiarBanner();
+
+        return;
+
+    }
+
+    statusElement.hidden = true;
+
+
+    catalog.forEach(item=>{
+
+        const card = document.createElement('a');
+
+        card.className = 'movie';
+
+        card.href = '#';
+
+        card.tabIndex = 0;
+
+
+        /* TIPO DE CONTENIDO */
+
+        card.dataset.type = item._type;
+
+        card.dataset.id = item.id || item.tmdb_id || '';
+
+
+        /* DATOS */
+
+        card.dataset.title = titleOf(item);
+
+        card.dataset.year = yearOf(item);
+
+        card.dataset.runtime = runtimeOf(item);
+
+        card.dataset.genres = genresOf(item);
+
+        card.dataset.quality = qualityOf(item);
+
+        card.dataset.age = ageOf(item);
+
+        card.dataset.logo = logoOf(item);
+
+        card.dataset.banner = bannerOf(item);
+
+        card.dataset.poster = posterOf(item);
+
+        card.dataset.overview = item.overview || '';
+
+        card.dataset.stream = streamOf(item);
+
+
+        /* TEMPORADAS */
+
+        card.dataset.seasons = item.number_of_seasons || '';
+
+
+        /* DATOS PARA BUSCAR */
+
+        card.dataset.youtubeTitle = item.youtube_title || '';
+
+        card.dataset.originalTitle =
+            item.original_title ||
+            item.original_name ||
+            '';
+
+        card.dataset.description = item.description || '';
+
+        card.dataset.fileName =
+            item.file_name ||
+            item.filename ||
+            item.file_path ||
+            '';
+
+        card.dataset.tmdbId = item.tmdb_id || '';
+
+        card.dataset.alternativeTitle =
+            item.alternative_title ||
+            item.title_original ||
+            '';
+
+
+        /* IMAGEN */
+
+        const poster = document.createElement('img');
+
+        poster.alt = '';
+
+        poster.loading = 'lazy';
+
+        poster.decoding = 'async';
+
+        poster.draggable = false;
+
+
+        if(card.dataset.poster){
+
+            poster.src = card.dataset.poster;
+
+        }else{
+
+            poster.style.visibility = 'hidden';
+
+        }
+
+
+        poster.addEventListener('error',()=>{
+
+            poster.style.visibility = 'hidden';
+
+        });
+
+
+        card.appendChild(poster);
+
+        movieRow.appendChild(card);
+
+
+        /* SELECCIÓN */
+
+        card.addEventListener('focus',()=>{
+
+            selectMovie(card);
+
+        });
+
+
+        card.addEventListener('mouseenter',()=>{
+
+            selectMovie(card);
+
+        });
+
+
+        /* El clic se gestiona de forma delegada desde movieRow. */
+
+    });
+
+
+    filterCatalog();
+
+}
+
+
+/* LIMPIAR BANNER */
+
+function limpiarBanner(){
+
+    selectedMovie = null;
+
+    header.style.backgroundImage = 'none';
+
+    info.classList.remove('visible');
+
+    titleElement.replaceChildren();
+
+    metaElement.textContent = '';
+
+    overviewElement.textContent = '';
+
+    movieRow.querySelectorAll('.movie').forEach(card=>{
+
+        card.classList.remove('selected');
+
+    });
+
+}
+
+
+/* SELECCIONAR CONTENIDO */
+
+function selectMovie(card){
+
+    if(!card || card.hidden)return;
+
+    selectedMovie = card;
+
+
+    movieRow.querySelectorAll('.movie').forEach(movie=>{
+
+        movie.classList.toggle('selected',movie === card);
+
+    });
+
+
+    /* BANNER */
+
+    const banner = card.dataset.banner;
+
+    header.style.backgroundImage = banner
+        ? 'url("' + banner.replace(/"/g,'%22') + '")'
+        : 'none';
+
+
+    /* LOGO O TÍTULO */
+
+    const contentTitle = card.dataset.title || 'SHARKTV';
+
+    const logo = card.dataset.logo;
+
+    titleElement.replaceChildren();
+
+
+    if(logo){
+
+        const image = document.createElement('img');
+
+        image.src = logo;
+
+        image.alt = contentTitle;
+
+        image.addEventListener('error',()=>{
+
+            titleElement.replaceChildren();
+
+            titleElement.textContent = contentTitle;
+
+        },{once:true});
+
+        titleElement.appendChild(image);
+
+    }else{
+
+        titleElement.textContent = contentTitle;
+
+    }
+
+
+    /* METADATOS */
+
+    const metadata = [
+
+        card.dataset.year,
+
+        card.dataset.type === 'series' && card.dataset.seasons
+            ? card.dataset.seasons + (
+                Number(card.dataset.seasons) === 1
+                    ? ' Temporada'
+                    : ' Temporadas'
+            )
+            : card.dataset.runtime,
+
+        card.dataset.genres,
+
+        card.dataset.quality,
+
+        card.dataset.age
+
+    ].filter(Boolean);
+
+
+    metaElement.textContent = metadata.join(' | ');
+
+
+    /* SINOPSIS */
+
+    overviewElement.textContent = card.dataset.overview || '';
+
+    info.classList.add('visible');
+
+}
+
+
+/* TARJETAS VISIBLES */
+
+function visibleCards(){
+
+    return [
+        ...movieRow.querySelectorAll('.movie:not([hidden])')
+    ];
+
+}
+
+
+/* COLUMNAS SEGÚN PANTALLA */
+
+function columns(){
+
+    if(window.innerWidth <= 600)return 3;
+
+    if(window.innerWidth <= 900)return 5;
+
+    return 8;
+
+}
+
+
+/* DESPLAZAMIENTO AUTOMÁTICO */
+
+function scrollToCard(card){
+
+    if(!card)return;
+
+    const rect = card.getBoundingClientRect();
+
+    const topLimit = 325;
+
+    const bottomLimit = window.innerHeight - 12;
+
+
+    if(rect.top < topLimit){
+
+        window.scrollBy(0,rect.top - topLimit);
+
+    }else if(rect.bottom > bottomLimit){
+
+        window.scrollBy(0,rect.bottom - bottomLimit);
+
+    }
+
+}
+
+
+/* DAR FOCO A UNA CARÁTULA */
+
+function focusCard(card){
+
+    if(!card || card.hidden)return;
+
+    card.focus({preventScroll:true});
+
+    selectMovie(card);
+
+    scrollToCard(card);
+
+}
+
+
+/* PRIMERA CARÁTULA */
+
+function firstCard(){
+
+    const cards = visibleCards();
+
+    if(cards.length){
+
+        focusCard(cards[0]);
+
+    }
+
+}
+
+
+/* ABRIR BUSCADOR */
+
+function openSearch(){
+
+    searchInput.classList.add('active');
+
+    searchInput.focus();
+
+}
+
+
+/* CERRAR BUSCADOR */
+
+function closeSearch(){
+
+    searchInput.value = '';
+
+    filterCatalog();
+
+    searchInput.classList.remove('active');
+
+    searchInput.blur();
+
+    searchButton.focus({preventScroll:true});
+
+}
+
+
+/* BUSCADOR DE PELÍCULAS Y SERIES */
+
+function filterCatalog(){
+
+    const query = normalizarTexto(searchInput.value);
+
+    const cards = [
+        ...movieRow.querySelectorAll('.movie')
+    ];
+
+    let firstMatch = null;
+
+    let totalMatches = 0;
+
+
+    cards.forEach(card=>{
+
+        const searchableText = [
+
+            card.dataset.title,
+
+            card.dataset.youtubeTitle,
+
+            card.dataset.originalTitle,
+
+            card.dataset.alternativeTitle,
+
+            card.dataset.year,
+
+            card.dataset.genres,
+
+            card.dataset.quality,
+
+            card.dataset.age,
+
+            card.dataset.overview,
+
+            card.dataset.description,
+
+            card.dataset.fileName,
+
+            card.dataset.tmdbId,
+
+            card.dataset.type
+
+        ].join(' ');
+
+
+        const text = normalizarTexto(searchableText);
+
+        const matches = text.includes(query);
+
+        card.hidden = !matches;
+
+
+        if(matches){
+
+            totalMatches++;
+
+            if(!firstMatch){
+                firstMatch = card;
+            }
+
+        }
+
+    });
+
+
+    if(firstMatch){
+
+        statusElement.hidden = true;
+
+        selectMovie(firstMatch);
+
+    }else if(query){
+
+        selectedMovie = null;
+
+        limpiarBanner();
+
+        statusElement.hidden = false;
+
+        statusElement.textContent =
+            'No se han encontrado películas ni series.';
+
+    }else{
+
+        statusElement.hidden = cards.length === 0;
+
+        if(firstMatch){
+            selectMovie(firstMatch);
+        }
+
+    }
+
+    return totalMatches;
+
+}
+
+
+/* CLICS DEL CATÁLOGO: delegación para ratón, táctil y mando */
+
+movieRow.addEventListener('click',event=>{
+
+    const card = event.target.closest('.movie');
+
+    if(!card || !movieRow.contains(card)) return;
+
+    event.preventDefault();
+
+    const item = catalog.find(entry =>
+        entry._type === card.dataset.type &&
+        String(entry.id || entry.tmdb_id || '') === String(card.dataset.id || '')
+    );
+
+    if(!item) {
+        alert('No se han podido identificar los datos de este título. Recarga la página.');
+        return;
+    }
+
+    selectMovie(card);
+
+    if(card.dataset.type === 'series') {
+        abrirSerie(item);
+    } else {
+        reproducirConWorker('movie',item);
+    }
+
+});
+
+/* EVENTOS DEL BUSCADOR */
+
+searchButton.addEventListener('click',openSearch);
+
+searchInput.addEventListener('input',filterCatalog);
+
+
+/* NAVEGACIÓN CON MANDO ANDROID TV */
+
+document.addEventListener('keydown',event=>{
+
+    const key = event.key;
+
+    const code = event.keyCode || event.which;
+
+
+    const up =
+        key === 'ArrowUp' ||
+        code === 38 ||
+        code === 19;
+
+    const down =
+        key === 'ArrowDown' ||
+        code === 40 ||
+        code === 20;
+
+    const left =
+        key === 'ArrowLeft' ||
+        code === 37 ||
+        code === 21;
+
+    const right =
+        key === 'ArrowRight' ||
+        code === 39 ||
+        code === 22;
+
+    const enter =
+        key === 'Enter' ||
+        code === 13 ||
+        code === 23 ||
+        code === 66;
+
+    const back =
+        key === 'Escape' ||
+        code === 27 ||
+        code === 4;
+
+
+    const active = document.activeElement;
+
+    const isSearchInput = active === searchInput;
+
+    const isSearchButton = active === searchButton;
+
+
+    /* CUANDO ESTAMOS ESCRIBIENDO */
+
+    if(isSearchInput){
+
+        if(back){
+
+            event.preventDefault();
+
+            closeSearch();
+
+            return;
+
+        }
+
+        if(up){
+
+            event.preventDefault();
+
+            searchButton.focus({preventScroll:true});
+
+            return;
+
+        }
+
+        if(down || enter){
+
+            event.preventDefault();
+
+            firstCard();
+
+            return;
+
+        }
+
+        return;
+
+    }
+
+
+    /* ICONO DEL BUSCADOR */
+
+    if(isSearchButton){
+
+        if(enter){
+
+            event.preventDefault();
+
+            openSearch();
+
+            return;
+
+        }
+
+        if(down){
+
+            event.preventDefault();
+
+            firstCard();
+
+            return;
+
+        }
+
+        if(up || left || right){
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+    }
+
+
+    /* TARJETA ACTIVA */
+
+    const activeCard = active && active.closest
+        ? active.closest('.movie')
+        : null;
+
+
+    if(!activeCard){
+
+        if(up || left){
+
+            event.preventDefault();
+
+            searchButton.focus({preventScroll:true});
+
+        }else if(down || right){
+
+            event.preventDefault();
+
+            firstCard();
+
+        }
+
+        return;
+
+    }
+
+
+    const cards = visibleCards();
+
+    const index = cards.indexOf(activeCard);
+
+
+    if(index < 0){
+
+        event.preventDefault();
+
+        firstCard();
+
+        return;
+
+    }
+
+
+    const cols = columns();
+
+    let next = index;
+
+
+    /* ENTER */
+
+    if(enter){
+
+        event.preventDefault();
+
+        if(activeCard.dataset.type === 'series'){
+
+            const item = catalog.find(x=>
+                String(x.id || x.tmdb_id) === String(activeCard.dataset.id) &&
+                x._type === 'series'
+            );
+
+            if(item){
+
+                abrirSerie(item);
+
+            }
+
+        }else{
+
+            const movieItem = catalog.find(x =>
+                x._type === 'movie' &&
+                String(x.tmdb_id || x.id || '') === String(activeCard.dataset.id || '')
+            );
+            if(movieItem) reproducirConWorker('movie',movieItem);
+
+        }
+
+        return;
+
+    }
+
+
+    /* ATRÁS */
+
+    if(back){
+
+        event.preventDefault();
+
+        searchButton.focus({preventScroll:true});
+
+        return;
+
+    }
+
+
+    /* DERECHA */
+
+    if(right){
+
+        next = Math.min(index + 1,cards.length - 1);
+
+    }
+
+
+    /* IZQUIERDA */
+
+    else if(left){
+
+        next = index % cols === 0
+            ? index
+            : index - 1;
+
+    }
+
+
+    /* ABAJO */
+
+    else if(down){
+
+        next = Math.min(index + cols,cards.length - 1);
+
+    }
+
+
+    /* ARRIBA */
+
+    else if(up){
+
+        if(index < cols){
+
+            event.preventDefault();
+
+            searchButton.focus({preventScroll:true});
+
+            return;
+
+        }
+
+        next = index - cols;
+
+    }else{
+
+        return;
+
+    }
+
+
+    event.preventDefault();
+
+    if(cards[next]){
+
+        focusCard(cards[next]);
+
+    }
+
+},true);
+
+
+
+/* REDIMENSIONAR */
+
+window.addEventListener('resize',()=>{
+
+    if(selectedMovie && !selectedMovie.hidden){
+
+        selectMovie(selectedMovie);
+
+    }
+
+});
+
+
+/* INICIAR SHARKTV */
+
+async function iniciar(){
+
+    await loadCatalog();
+
+    requestAnimationFrame(()=>{
+
+        requestAnimationFrame(()=>{
+
+            firstCard();
+
+        });
+
+    });
+
+}
+
+
+iniciar();
+
+</script>
+
+</body>
+</html>
