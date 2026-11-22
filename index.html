@@ -779,6 +779,8 @@ const statusElement = document.getElementById('status');
 
 let catalog = [];
 let selectedMovie = null;
+let sharkVisibleCards = null;
+let sharkLastFocusedRow = -1;
 
 
 /* NORMALIZAR TEXTO */
@@ -1425,11 +1427,10 @@ function renderMovieHeader(card){
 /* TARJETAS VISIBLES */
 
 function visibleCards(){
-
-    return [
-        ...movieRow.querySelectorAll('.movie:not([hidden])')
-    ];
-
+    if(sharkVisibleCards===null){
+        sharkVisibleCards=Array.from(movieRow.querySelectorAll('.movie:not([hidden])'));
+    }
+    return sharkVisibleCards;
 }
 
 
@@ -1475,15 +1476,15 @@ function scrollToCard(card){
 /* DAR FOCO A UNA CARÁTULA */
 
 function focusCard(card){
-
     if(!card || card.hidden)return;
-
+    const index=visibleCards().indexOf(card);
+    const row=index<0?-1:Math.floor(index/columns());
     card.focus({preventScroll:true});
-
     selectMovie(card);
-
-    scrollToCard(card);
-
+    if(row!==sharkLastFocusedRow){
+        sharkLastFocusedRow=row;
+        scrollToCard(card);
+    }
 }
 
 
@@ -1596,6 +1597,9 @@ function filterCatalog(){
         }
 
     });
+
+    sharkVisibleCards = cards.filter(card=>!card.hidden);
+    sharkLastFocusedRow = -1;
 
 
     if(firstMatch){
