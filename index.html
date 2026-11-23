@@ -1570,24 +1570,37 @@ function closeSearch(){
 
 /* BUSCADOR DE PELÍCULAS Y SERIES */
 
+function normalizarBusqueda(valor){
+    return String(valor || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .toLocaleLowerCase('es')
+        .trim();
+}
+
 function filterCatalog(){
-    const query = searchInput.value.trim().toLocaleLowerCase('es');
+    const query = normalizarBusqueda(searchInput.value);
     const cards = [...movieRow.querySelectorAll('.movie')];
     let firstMatch = null;
 
     cards.forEach(card => {
-        const text = [
+        const text = normalizarBusqueda([
             card.dataset.title,
+            card.dataset.originalTitle,
+            card.dataset.alternativeTitle,
+            card.dataset.youtubeTitle,
             card.dataset.year,
             card.dataset.genres,
             card.dataset.quality,
             card.dataset.age,
-            card.dataset.overview
-        ].join(' ').toLocaleLowerCase('es');
+            card.dataset.overview,
+            card.dataset.description,
+            card.dataset.fileName,
+            card.dataset.tmdbId
+        ].join(' '));
 
-        const matches = text.includes(query);
+        const matches = !query || text.includes(query);
         card.hidden = !matches;
-
         if (matches && !firstMatch) firstMatch = card;
     });
 
@@ -1598,12 +1611,15 @@ function filterCatalog(){
         statusElement.hidden = true;
         selectMovie(firstMatch);
     } else if (query) {
-        selectedMovie = null;
         limpiarBanner();
         statusElement.hidden = false;
         statusElement.textContent = 'No se han encontrado contenidos.';
     } else {
         statusElement.hidden = cards.length === 0;
+        if (cards.length) {
+            const statusMessage = statusElement.textContent || '';
+            if (statusMessage === 'No se han encontrado contenidos.') statusElement.textContent = '';
+        }
     }
 }
 
