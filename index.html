@@ -1571,103 +1571,40 @@ function closeSearch(){
 /* BUSCADOR DE PELÍCULAS Y SERIES */
 
 function filterCatalog(){
-
-    const query = normalizarTexto(searchInput.value);
-
-    const cards = [
-        ...movieRow.querySelectorAll('.movie')
-    ];
-
+    const query = searchInput.value.trim().toLocaleLowerCase('es');
+    const cards = [...movieRow.querySelectorAll('.movie')];
     let firstMatch = null;
 
-    let totalMatches = 0;
-
-
-    cards.forEach(card=>{
-
-        const searchableText = [
-
+    cards.forEach(card => {
+        const text = [
             card.dataset.title,
-
-            card.dataset.youtubeTitle,
-
-            card.dataset.originalTitle,
-
-            card.dataset.alternativeTitle,
-
             card.dataset.year,
-
             card.dataset.genres,
-
             card.dataset.quality,
-
             card.dataset.age,
-
-            card.dataset.overview,
-
-            card.dataset.description,
-
-            card.dataset.fileName,
-
-            card.dataset.tmdbId,
-
-            card.dataset.type
-
-        ].join(' ');
-
-
-        const text = normalizarTexto(searchableText);
+            card.dataset.overview
+        ].join(' ').toLocaleLowerCase('es');
 
         const matches = text.includes(query);
-
         card.hidden = !matches;
 
-
-        if(matches){
-
-            totalMatches++;
-
-            if(!firstMatch){
-                firstMatch = card;
-            }
-
-        }
-
+        if (matches && !firstMatch) firstMatch = card;
     });
 
-    sharkVisibleCards = cards.filter(card=>!card.hidden);
+    sharkVisibleCards = cards.filter(card => !card.hidden);
     sharkLastFocusedRow = -1;
 
-
-    if(firstMatch){
-
+    if (firstMatch) {
         statusElement.hidden = true;
-
         selectMovie(firstMatch);
-
-    }else if(query){
-
+    } else if (query) {
         selectedMovie = null;
-
         limpiarBanner();
-
         statusElement.hidden = false;
-
-        statusElement.textContent =
-            'No se han encontrado películas ni series.';
-
-    }else{
-
+        statusElement.textContent = 'No se han encontrado contenidos.';
+    } else {
         statusElement.hidden = cards.length === 0;
-
-        if(firstMatch){
-            selectMovie(firstMatch);
-        }
-
     }
-
-    return totalMatches;
-
 }
 
 
