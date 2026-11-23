@@ -1655,6 +1655,12 @@ searchButton.addEventListener('click',openSearch);
 
 searchInput.addEventListener('input',filterCatalog);
 
+searchInput.addEventListener('blur', () => {
+    if (!searchInput.value.trim()) {
+        searchInput.classList.remove('active');
+    }
+});
+
 
 /* NAVEGACIÓN CON MANDO ANDROID TV */
 
