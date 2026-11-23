@@ -1526,6 +1526,8 @@ function firstCard(){
 
 function openSearch(){
 
+    movieRow.querySelectorAll('.movie.selected').forEach(card=>card.classList.remove('selected'));
+    selectedMovie=null;
     searchInput.classList.add('active');
 
     searchInput.focus();
@@ -1601,9 +1603,11 @@ function filterCatalog(){
     sharkVisibleCards = cards.filter(card => !card.hidden);
     sharkLastFocusedRow = -1;
 
+    if (selectedMovie) selectedMovie.classList.remove('selected');
+    selectedMovie = null;
+
     if (firstMatch) {
         statusElement.hidden = true;
-        selectMovie(firstMatch);
     } else if (query) {
         limpiarBanner();
         statusElement.hidden = false;
