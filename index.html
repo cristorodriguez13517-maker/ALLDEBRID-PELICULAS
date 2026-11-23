@@ -1603,7 +1603,19 @@ function filterCatalog(){
         ].join(' '));
 
         const matches = !query || text.includes(query);
+
+        // Aplicar el ocultamiento también directamente en el estilo inline.
+        // Esto evita que cualquier regla CSS del diseño fuerce display:block
+        // y vuelva a mostrar portadas que no coinciden con la búsqueda.
         card.hidden = !matches;
+        if (matches) {
+            card.style.removeProperty('display');
+            card.removeAttribute('aria-hidden');
+        } else {
+            card.style.setProperty('display', 'none', 'important');
+            card.setAttribute('aria-hidden', 'true');
+        }
+
         if (matches && !firstMatch) firstMatch = card;
     });
 
