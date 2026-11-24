@@ -1986,9 +1986,7 @@ document.addEventListener('keydown',event=>{
 
     else if(left){
 
-        next = index % cols === 0
-            ? index
-            : index - 1;
+        next = index > 0 ? index - 1 : index;
 
     }
 
