@@ -1633,6 +1633,8 @@ function focusCard(card){
 
 /* PRIMERA CARÁTULA */
 
+function selectFirstSearchResult(){const card=visibleCards()[0];if(!card)return;searchInput.classList.remove('active');searchInput.blur();focusCard(card);}
+
 function firstCard(){
 
     const cards = visibleCards();
@@ -1876,7 +1878,7 @@ document.addEventListener('keydown',event=>{
 
             event.preventDefault();
 
-            firstCard();
+            selectFirstSearchResult();
 
             return;
 
