@@ -2056,15 +2056,10 @@ async function iniciar(){
     await loadCatalog();
 
     requestAnimationFrame(()=>{
-
         requestAnimationFrame(()=>{
-
-            firstCard();
-            const initialCard=document.activeElement&&document.activeElement.closest('.movie');
-            if(initialCard)initialCard.classList.add('shark-no-initial-frame');
-
+            const first=visibleCards()[0];
+            if(first)renderMovieHeader(first);
         });
-
     });
 
 }
