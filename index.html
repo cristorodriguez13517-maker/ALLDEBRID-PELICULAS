@@ -1809,7 +1809,6 @@ function prepararTarjetaCatalogo(event,inmediata=false){
     if(item)programarPrecarga('movie',item,inmediata);
 }
 movieRow.addEventListener('pointerdown',event=>prepararTarjetaCatalogo(event,true));
-movieRow.addEventListener('focusin',event=>prepararTarjetaCatalogo(event,false));
 
 movieRow.addEventListener('click',event=>{
 
