@@ -2152,8 +2152,8 @@ async function iniciar(){
 
     requestAnimationFrame(()=>{
         requestAnimationFrame(()=>{
-            const first=visibleCards()[0];
-            if(first)renderMovieHeader(first);
+            const firstContent=visibleCards().find(card=>card.dataset.type!=='shortcut');
+            if(firstContent)renderMovieHeader(firstContent);
         });
     });
 
@@ -2334,7 +2334,7 @@ iniciar();
 .youtube-catalog-artwork{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:radial-gradient(ellipse at center,#343434 0%,#111 72%,#080808 100%)}
 .youtube-catalog-artwork svg{width:58%;max-width:84px;height:auto;filter:drop-shadow(0 3px 8px #000)}
 .youtube-catalog-artwork span{font-size:clamp(11px,1.1vw,15px);font-weight:800;letter-spacing:.5px;color:#fff;text-align:center}
-.youtube-catalog-card.selected,.youtube-catalog-card:focus-visible{outline:3px solid #e50914!important;outline-offset:2px}
+.youtube-catalog-card.selected,.youtube-catalog-card:focus-visible{outline:none!important;box-shadow:none!important}
 </style>
 </body>
 </html>
@@ -2402,9 +2402,9 @@ iniciar();
 }
 .movie-row .movie.youtube-catalog-card.selected,
 .movie-row .movie.youtube-catalog-card:focus-visible{
-  border-color:#e50914!important;
-  outline:2px solid #e50914!important;
-  outline-offset:1px!important;
+  border-color:#555!important;
+  outline:none!important;
+  box-shadow:none!important;
 }
 @media(max-width:600px){
   .movie-row .movie.youtube-catalog-card{
@@ -2713,46 +2713,3 @@ iniciar();
 </style>
 
 
-<style id="alldebrid-clean-poster-frames">
-/* Quitar el doble marco rojo y cualquier franja de fondo bajo las carátulas. */
-.movie-row .movie,
-#movie-row .movie,
-#series-grid .movie{
-  outline:none!important;
-  box-shadow:none!important;
-  background:transparent!important;
-  border:0!important;
-  overflow:hidden!important;
-}
-.movie-row .movie img,
-#movie-row .movie img,
-#series-grid .movie img{
-  display:block!important;
-  box-sizing:border-box!important;
-  width:100%!important;
-  height:100%!important;
-  margin:0!important;
-  border:0!important;
-  outline:none!important;
-  box-shadow:none!important;
-  background:transparent!important;
-  object-fit:cover!important;
-  vertical-align:top!important;
-}
-.movie-row .movie.selected,
-.movie-row .movie:focus-visible,
-#movie-row .movie.selected,
-#movie-row .movie:focus-visible,
-#series-grid .movie.selected,
-#series-grid .movie:focus-visible,
-.movie-row .movie.selected img,
-.movie-row .movie:focus-visible img,
-#movie-row .movie.selected img,
-#movie-row .movie:focus-visible img,
-#series-grid .movie.selected img,
-#series-grid .movie:focus-visible img{
-  outline:none!important;
-  border:0!important;
-  box-shadow:none!important;
-}
-</style>
