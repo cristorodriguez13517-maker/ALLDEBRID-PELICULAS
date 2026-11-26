@@ -2397,7 +2397,7 @@ iniciar();
   const magnet=params.get('shark_magnet'),file=params.get('shark_path');
   if(!magnet||!file||window.__sharkResumeStarted)return;
   const list=Array.isArray(items)?items:[];
-  const record=list.find(x=>String(x&&x.magnet_id||'')===magnet&&String(x&&x.file_path||''))
+  const record=list.find(x=>String(x&&x.magnet_id||'')===magnet&&String(x&&x.file_path||'')===file)
     ||{magnet_id:magnet,file_path:file,title_manual:params.get('shark_title')||''};
   window.__sharkResumeStarted=true;
   reproducirConWorker(params.get('shark_kind')||'movie',record);
