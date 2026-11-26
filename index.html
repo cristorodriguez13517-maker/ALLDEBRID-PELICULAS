@@ -1008,6 +1008,7 @@ async function loadCatalog(){
         catalog.sort((a,b)=>fechaOrden(b)-fechaOrden(a));
 
         renderCatalog();
+        if(window.__sharkResumeAllDebrid)window.__sharkResumeAllDebrid(catalog);
 
     }catch(error){
 
@@ -2358,6 +2359,17 @@ iniciar();
   }catch(e){console.warn('No se pudo guardar Seguir viendo:',e)}
  }
  window.SHARKTVContinue={save};
+ window.__sharkResumeAllDebrid=function(items){
+  const params=new URLSearchParams(location.search);
+  const magnet=params.get('shark_magnet'),file=params.get('shark_path');
+  if(!magnet||!file||window.__sharkResumeStarted)return;
+  const list=Array.isArray(items)?items:[];
+  const record=list.find(x=>String(x&&x.magnet_id||'')===magnet&&String(x&&x.file_path||'')===file);
+  if(!record){console.warn('No se encontró el archivo AllDebrid para reanudar.');return;}
+  window.__sharkResumeStarted=true;
+  setTimeout(()=>reproducirConWorker(params.get('shark_kind')||'movie',record),500);
+ };
+
  
  
  
