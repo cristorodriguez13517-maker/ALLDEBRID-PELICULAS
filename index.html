@@ -2028,6 +2028,11 @@ document.addEventListener('keydown',event=>{
 
         event.preventDefault();
 
+        if(activeCard.dataset.type === 'shortcut'){
+            window.location.href = 'https://cristorodriguez13517-maker.github.io/PELICULAS/';
+            return;
+        }
+
         if(activeCard.dataset.type === 'series'){
 
             const item = catalog.find(x=>
