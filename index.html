@@ -2711,3 +2711,48 @@ iniciar();
   flex:none!important;
 }
 </style>
+
+
+<style id="alldebrid-clean-poster-frames">
+/* Quitar el doble marco rojo y cualquier franja de fondo bajo las carátulas. */
+.movie-row .movie,
+#movie-row .movie,
+#series-grid .movie{
+  outline:none!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  border:0!important;
+  overflow:hidden!important;
+}
+.movie-row .movie img,
+#movie-row .movie img,
+#series-grid .movie img{
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:100%!important;
+  margin:0!important;
+  border:0!important;
+  outline:none!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  object-fit:cover!important;
+  vertical-align:top!important;
+}
+.movie-row .movie.selected,
+.movie-row .movie:focus-visible,
+#movie-row .movie.selected,
+#movie-row .movie:focus-visible,
+#series-grid .movie.selected,
+#series-grid .movie:focus-visible,
+.movie-row .movie.selected img,
+.movie-row .movie:focus-visible img,
+#movie-row .movie.selected img,
+#movie-row .movie:focus-visible img,
+#series-grid .movie.selected img,
+#series-grid .movie:focus-visible img{
+  outline:none!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+</style>
