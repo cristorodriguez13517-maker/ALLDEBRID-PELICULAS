@@ -2339,6 +2339,87 @@ iniciar();
 </body>
 </html>
 
+<style id="alldebrid-youtube-card-full-frame">
+/* La tarjeta de acceso ocupa exactamente el marco de una carátula. */
+.movie-row .movie.youtube-catalog-card{
+  position:relative!important;
+  display:block!important;
+  box-sizing:border-box!important;
+  width:135px!important;
+  min-width:135px!important;
+  max-width:135px!important;
+  height:187px!important;
+  min-height:187px!important;
+  max-height:187px!important;
+  aspect-ratio:135/187!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:hidden!important;
+  border:2px solid #555!important;
+  border-radius:12px!important;
+  background:linear-gradient(145deg,#292929 0%,#080808 100%)!important;
+}
+.movie-row .movie.youtube-catalog-card .youtube-catalog-artwork{
+  position:absolute!important;
+  inset:0!important;
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:12px 6px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:12px!important;
+  overflow:hidden!important;
+  border-radius:9px!important;
+}
+.movie-row .movie.youtube-catalog-card .youtube-catalog-artwork svg{
+  display:block!important;
+  flex:0 0 auto!important;
+  width:58%!important;
+  max-width:84px!important;
+  max-height:65px!important;
+  height:auto!important;
+  object-fit:contain!important;
+}
+.movie-row .movie.youtube-catalog-card .youtube-catalog-artwork span{
+  display:block!important;
+  flex:0 0 auto!important;
+  max-width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  color:#fff!important;
+  font-size:13px!important;
+  line-height:1.2!important;
+  font-weight:800!important;
+  letter-spacing:.3px!important;
+  text-align:center!important;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+}
+.movie-row .movie.youtube-catalog-card.selected,
+.movie-row .movie.youtube-catalog-card:focus-visible{
+  border-color:#e50914!important;
+  outline:2px solid #e50914!important;
+  outline-offset:1px!important;
+}
+@media(max-width:600px){
+  .movie-row .movie.youtube-catalog-card{
+    width:100%!important;
+    min-width:0!important;
+    max-width:135px!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    aspect-ratio:135/187!important;
+  }
+}
+</style>
+
+
 <style>
 /* Menor separación horizontal entre carátulas */
 .movie-row{column-gap:8px!important}
