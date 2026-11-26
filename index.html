@@ -2160,6 +2160,8 @@ async function iniciar(){
         requestAnimationFrame(()=>{
             const firstContent=visibleCards().find(card=>card.dataset.type!=='shortcut');
             if(firstContent)renderMovieHeader(firstContent);
+            header.style.backgroundImage = 'url("./contenido-peliculas.svg")';
+            header.classList.add('has-banner');
         });
     });
 
